@@ -10,15 +10,18 @@ import {
     useForm
 } from 'react-hook-form';
 import useRegisterModal from '@/app/hooks/useRegisterModal';
+import useLoginModal from '@/app/hooks/useLoginModal';
 import Modal from './Modal';
 import Heading from '../Heading';
 import Input from '../inputs/Input';
 import { toast } from 'react-hot-toast';
 import Button from '../Button';
+import { signIn } from 'next-auth/react';
 
 const RegisterModal = () => {
-    const registerModal = useRegisterModal();//where we shall get our controls
+    const registerModal = useRegisterModal(); //where we shall get our controls
     //lets add our login states
+    const loginModal = useLoginModal();
     const [ isLoading, setIsLoading] = useState(false);
     //use form
     const {
@@ -28,22 +31,23 @@ const RegisterModal = () => {
             //imported from react form which is a function which will have an object of default values where we will
             //set our default values which are name, email, password
             errors,
-        }
+        },
     } = useForm<FieldValues>({
         defaultValues: {
             name: '',
             email: '',
             password: ''
-        }
+        },
     });
 
 const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    //initiate axios post through the register endpoind
+    //initiate axios post through the register endpoint
     axios.post('/api/register', data)
     //we'll close the register modal after succesful registered
     .then(() => {
+        toast.success('Registered');
         registerModal.onClose();
     })
     .catch((error) => {
@@ -53,6 +57,12 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(false);
     })
 }
+
+//close the register modal and open the login
+const toggle = useCallback(() => {
+    registerModal.onClose();
+    loginModal.onOpen();
+}, [loginModal, registerModal]);
 
     const bodyContent = (
         <div className='flex flex-col gap-4'>
@@ -93,13 +103,13 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
             outline
             label="Continue with Google"
             icon={FcGoogle}
-            onClick={() => {}}
+            onClick={() => signIn('google')}
             />
             <Button
             outline
             label="Continue with Github"
             icon={AiFillGithub}
-            onClick={() => {}}
+            onClick={() => signIn('github')}
             />
             <div className='
             text-neutral-500
@@ -108,7 +118,7 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
             font-light'>
             <div className="justify-center flex flex-row items-center gap-2"><div>Already have an Account?</div>
             <div 
-            onClick={registerModal.onClose}
+            onClick={toggle}
             className='
             text-neutral-800
             cursor-pointer
@@ -132,4 +142,4 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
   );
 }
 
-export default RegisterModal
+export default RegisterModal;

@@ -21,8 +21,10 @@ import { useRouter } from 'next/navigation';
 
 const LoginModal = () => {
     const router =useRouter();
+
     const registerModal = useRegisterModal();//where we shall get our controls
     const loginModal = useLoginModal();  //lets add our login states
+
     const [ isLoading, setIsLoading] = useState(false);
     //use form
     const {
@@ -60,6 +62,11 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
         }
     })
 }
+    //close the login modal and open the register
+    const toggle = useCallback(() => {
+        loginModal.onClose();
+        registerModal.onOpen();
+    }, [loginModal, registerModal]);
 
     const bodyContent = (
         <div className='flex flex-col gap-4'>
@@ -92,26 +99,26 @@ const onSubmit: SubmitHandler<FieldValues> = (data) => {
             outline
             label="Continue with Google"
             icon={FcGoogle}
-            onClick={() => {}}
+            onClick={() => signIn('google')}
             />
             <Button
             outline
             label="Continue with Github"
             icon={AiFillGithub}
-            onClick={() => {}}
+            onClick={() => signIn('github')}
             />
             <div className='
             text-neutral-500
             text-center
             mt-4
             font-light'>
-            <div className="justify-center flex flex-row items-center gap-2"><div>Already have an Account?</div>
+            <div className="justify-center flex flex-row items-center gap-2"><div>First time using Airbnb?</div>
             <div 
-            onClick={registerModal.onClose}
+            onClick={toggle}
             className='
             text-neutral-800
             cursor-pointer
-            hover:underline'>Log in</div></div>
+            hover:underline'>Create an account</div></div>
             </div>
         </div>
     )
